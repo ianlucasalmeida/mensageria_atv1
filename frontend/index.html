@@ -2,53 +2,61 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Realizar Pedido</title>
+  <title>Pedidos - E-commerce</title>
   <style>
-    body { font-family: Arial; max-width: 500px; margin: 40px auto; }
-    input, textarea, button { width: 100%; margin: 10px 0; padding: 10px; }
-    label { font-weight: bold; }
+    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
+    input, button { padding: 10px; width: 100%; margin: 5px 0; }
+    .notificacao { padding: 10px; margin: 10px 0; background: #e0ffe0; border-left: 4px solid green; }
   </style>
 </head>
 <body>
   <h1>📦 Novo Pedido</h1>
   <form id="pedidoForm">
-    <label for="cliente">Cliente:</label>
-    <input type="text" id="cliente" required title="Nome do cliente" placeholder="Digite o nome do cliente" />
-    
-    <label for="itens">Itens (separados por vírgula):</label>
-    <input type="text" id="itens" required title="Itens do pedido" placeholder="Ex: arroz, feijão, açúcar" />
-
-    <label for="quantidade">Quantidade:</label>
-    <input type="number" id="quantidade" required title="Quantidade total" placeholder="Digite a quantidade" />
-
-    <label for="valor_total">Valor Total (R$):</label>
-    <input type="number" step="0.01" id="valor_total" required title="Valor total do pedido" placeholder="Digite o valor total" />
-
+    <input type="text" id="cliente" placeholder="Nome do cliente" required />
+    <input type="text" id="itens" placeholder="Itens separados por vírgula" required />
+    <input type="number" id="valor" placeholder="Valor total" step="0.01" required />
     <button type="submit">Enviar Pedido</button>
   </form>
 
-  <p id="resposta"></p>
+  <div id="notificacoes"></div>
 
   <script>
-    const form = document.getElementById("pedidoForm");
-    form.addEventListener("submit", async (e) => {
+    // WebSocket nativo
+    let ws = new WebSocket("ws://localhost:8000/ws");
+    ws.onmessage = (e) => {
+      const div = document.createElement("div");
+      div.className = "notificacao";
+      div.innerText = e.data;
+      document.getElementById("notificacoes").prepend(div);
+    };
+
+    // Envio de pedido
+    document.getElementById("pedidoForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const dados = {
-        cliente: document.getElementById("cliente").value,
-        itens: document.getElementById("itens").value.split(",").map(i => i.trim()),
-        quantidade: parseInt(document.getElementById("quantidade").value),
-        valor_total: parseFloat(document.getElementById("valor_total").value)
+      const cliente = document.getElementById("cliente").value;
+      const itensStr = document.getElementById("itens").value;
+      const valor = document.getElementById("valor").value;
+
+      const pedido = {
+        cliente,
+        itens: itensStr.split(',').map((nome, i) => ({
+          id: i + 1,
+          nome: nome.trim(),
+          preco: parseFloat((valor / itensStr.split(',').length).toFixed(2)),
+          quantidade: 1
+        })),
+        valorTotal: valor,
+        data: new Date().toISOString()
       };
 
-      const resposta = await fetch("http://localhost:8000/pedido", {
+      const res = await fetch("http://localhost:8000/pedido", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados)
+        body: JSON.stringify(pedido)
       });
 
-      const json = await resposta.json();
-      document.getElementById("resposta").innerText = json.message || "Erro ao enviar pedido";
+      const json = await res.json();
+      alert(json.message);
     });
   </script>
 </body>
