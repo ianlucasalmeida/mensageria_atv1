@@ -2,61 +2,657 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pedidos - E-commerce</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
   <style>
-    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
-    input, button { padding: 10px; width: 100%; margin: 5px 0; }
-    .notificacao { padding: 10px; margin: 10px 0; background: #e0ffe0; border-left: 4px solid green; }
+    :root {
+      --primary-color: #4a6fa5;
+      --secondary-color: #166088;
+      --accent-color: #26a69a;
+      --light-bg: #f5f5f5;
+      --dark-text: #333;
+      --light-text: #fff;
+      --border-radius: 8px;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background-color: var(--light-bg);
+      color: var(--dark-text);
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    header {
+      margin-bottom: 30px;
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 2px solid var(--primary-color);
+    }
+    
+    h1, h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+    
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    
+    @media (min-width: 768px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .section {
+      background-color: #fff;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--secondary-color);
+    }
+    
+    .input-icon {
+      position: relative;
+    }
+    
+    .input-icon i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.25);
+    }
+    
+    .itens-wrapper {
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      padding: 5px 10px;
+      transition: var(--transition);
+      background-color: white;
+    }
+    
+    .itens-wrapper.foco {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.25);
+    }
+    
+    .itens-container {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 5px 0;
+      min-height: 40px;
+    }
+    
+    .item-tag {
+      display: inline-block;
+      background-color: #e3f2fd;
+      border: 1px solid #90caf9;
+      color: #1565c0;
+      border-radius: 16px;
+      padding: 4px 12px;
+      margin: 5px 5px 5px 0;
+      font-size: 0.875rem;
+    }
+    
+    .item-tag i {
+      margin-left: 5px;
+      cursor: pointer;
+    }
+    
+    #itensInput {
+      border: none;
+      flex-grow: 1;
+      min-width: 100px;
+      padding: 8px 0;
+      margin: 5px 0;
+    }
+    
+    #itensInput:focus {
+      outline: none;
+      box-shadow: none;
+    }
+    
+    button {
+      background-color: var(--accent-color);
+      color: var(--light-text);
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-weight: bold;
+      transition: var(--transition);
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    
+    button:hover {
+      background-color: #1c897e;
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button i {
+      margin-right: 8px;
+    }
+    
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .notificacoes-list {
+      margin-top: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .notificacao {
+      padding: 12px 15px;
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      margin-bottom: 10px;
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
+      animation: fadeIn 0.5s;
+      display: flex;
+      align-items: center;
+    }
+    
+    .notificacao i {
+      margin-right: 10px;
+      color: #4caf50;
+      font-size: 1.2rem;
+    }
+    
+    .notificacao-time {
+      font-size: 0.85rem;
+      color: #666;
+      margin-right: 10px;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 0.8em;
+      margin-left: 10px;
+    }
+    
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--light-text);
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+      visibility: hidden;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .resumo-pedido {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    
+    .resumo-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    
+    .resumo-item.total {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-top: 10px;
+      color: var(--secondary-color);
+    }
+    
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    
+    .resposta {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      text-align: center;
+      font-weight: 500;
+      animation: fadeIn 0.3s;
+      display: none;
+    }
+    
+    .resposta.sucesso {
+      background-color: rgba(76, 175, 80, 0.2);
+      color: #2e7d32;
+      border: 1px solid #81c784;
+    }
+    
+    .resposta.erro {
+      background-color: rgba(244, 67, 54, 0.2);
+      color: #d32f2f;
+      border: 1px solid #e57373;
+    }
   </style>
 </head>
 <body>
-  <h1>📦 Novo Pedido</h1>
-  <form id="pedidoForm">
-    <input type="text" id="cliente" placeholder="Nome do cliente" required />
-    <input type="text" id="itens" placeholder="Itens separados por vírgula" required />
-    <input type="number" id="valor" placeholder="Valor total" step="0.01" required />
-    <button type="submit">Enviar Pedido</button>
-  </form>
+  <header>
+    <h1><i class="fas fa-store"></i> Sistema de Pedidos</h1>
+  </header>
 
-  <div id="notificacoes"></div>
+  <div class="container">
+    <div class="section">
+      <h2><i class="fas fa-shopping-cart"></i> Novo Pedido</h2>
+      
+      <form id="pedidoForm">
+        <div class="form-group">
+          <label for="cliente">Nome do cliente:</label>
+          <div class="input-icon">
+            <input 
+              type="text" 
+              id="cliente" 
+              placeholder="Digite o nome do cliente" 
+              required 
+              autocomplete="name"
+            />
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="itensInput">Itens do pedido:</label>
+          <div class="itens-wrapper" id="itensBox">
+            <div class="itens-container" id="itensContainer">
+              <input 
+                type="text" 
+                id="itensInput" 
+                placeholder="Digite o item e pressione Enter" 
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <input type="hidden" id="itensHidden" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="valor">Valor Total (R$):</label>
+          <div class="input-icon">
+            <input 
+              type="number" 
+              id="valor" 
+              placeholder="Valor total" 
+              step="0.01" 
+              min="0.01"
+              required 
+            />
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+        </div>
+        
+        <div class="resumo-pedido" id="resumoPedido">
+          <h3>Resumo do Pedido</h3>
+          <div id="resumoItens"></div>
+          <div class="resumo-item total">
+            <span>Valor Total:</span>
+            <span id="resumoTotal">R$ 0,00</span>
+          </div>
+        </div>
+        
+        <button type="submit" id="btnSubmit">
+          <span class="loader" id="submitLoader"></span>
+          <i class="fas fa-paper-plane"></i>
+          Enviar Pedido
+        </button>
+      </form>
+      
+      <div class="resposta" id="respostaBox"></div>
+    </div>
+    
+    <div class="section">
+      <h2><i class="fas fa-bell"></i> Notificações <span id="notificacoesCount" class="badge">0</span></h2>
+      <div class="notificacoes-list" id="notificacoes"></div>
+    </div>
+  </div>
 
   <script>
-    // WebSocket nativo
-    let ws = new WebSocket("ws://localhost:8000/ws");
-    ws.onmessage = (e) => {
+    // Elementos do DOM
+    const form = document.getElementById("pedidoForm");
+    const clienteInput = document.getElementById("cliente");
+    const itensInput = document.getElementById("itensInput");
+    const itensContainer = document.getElementById("itensContainer");
+    const itensHidden = document.getElementById("itensHidden");
+    const itensBox = document.getElementById("itensBox");
+    const valorInput = document.getElementById("valor");
+    const resumoItens = document.getElementById("resumoItens");
+    const resumoTotal = document.getElementById("resumoTotal");
+    const btnSubmit = document.getElementById("btnSubmit");
+    const submitLoader = document.getElementById("submitLoader");
+    const respostaBox = document.getElementById("respostaBox");
+    const notificacoesList = document.getElementById("notificacoes");
+    const notificacoesCount = document.getElementById("notificacoesCount");
+    
+    // Contador de notificações
+    let contadorNotificacoes = 0;
+    
+    // Array para armazenar os itens
+    let itens = [];
+    
+    // Inicializar WebSocket nativo (mantido conforme o código original)
+    let ws;
+    try {
+      ws = new WebSocket("ws://localhost:8000/ws");
+      
+      ws.onopen = () => {
+        console.log("Conexão WebSocket estabelecida");
+        adicionarNotificacao("Sistema conectado e pronto para receber pedidos", "check-circle");
+      };
+      
+      ws.onmessage = (e) => {
+        adicionarNotificacao(e.data, "bell");
+      };
+      
+      ws.onerror = (e) => {
+        console.error("Erro WebSocket:", e);
+        adicionarNotificacao("Erro na conexão com o servidor de notificações", "exclamation-triangle");
+      };
+      
+      ws.onclose = () => {
+        console.log("Conexão WebSocket fechada");
+        adicionarNotificacao("Conexão com o servidor encerrada. Recarregue a página para reconectar.", "times-circle");
+      };
+    } catch (error) {
+      console.error("Falha ao inicializar WebSocket:", error);
+      adicionarNotificacao("Falha ao conectar com o servidor de notificações", "exclamation-triangle");
+    }
+    
+    // Função para adicionar notificação
+    function adicionarNotificacao(mensagem, icone = "info-circle") {
       const div = document.createElement("div");
       div.className = "notificacao";
-      div.innerText = e.data;
-      document.getElementById("notificacoes").prepend(div);
-    };
-
-    // Envio de pedido
-    document.getElementById("pedidoForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const cliente = document.getElementById("cliente").value;
-      const itensStr = document.getElementById("itens").value;
-      const valor = document.getElementById("valor").value;
-
-      const pedido = {
-        cliente,
-        itens: itensStr.split(',').map((nome, i) => ({
-          id: i + 1,
-          nome: nome.trim(),
-          preco: parseFloat((valor / itensStr.split(',').length).toFixed(2)),
-          quantidade: 1
-        })),
-        valorTotal: valor,
-        data: new Date().toISOString()
-      };
-
-      const res = await fetch("http://localhost:8000/pedido", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pedido)
+      
+      // Adicionar timestamp
+      const agora = new Date();
+      const hora = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+      
+      div.innerHTML = `
+        <i class="fas fa-${icone}"></i>
+        <span class="notificacao-time">${hora}</span>
+        <span>${mensagem}</span>
+      `;
+      
+      notificacoesList.prepend(div);
+      
+      // Atualizar contador
+      contadorNotificacoes++;
+      notificacoesCount.textContent = contadorNotificacoes;
+    }
+    
+    // Atualizar o campo oculto com os itens
+    function atualizarItensHidden() {
+      itensHidden.value = itens.length > 0 ? JSON.stringify(itens) : "";
+      
+      // Validar para o atributo required funcionar
+      if (itens.length === 0) {
+        itensHidden.setCustomValidity("Adicione pelo menos um item ao pedido");
+      } else {
+        itensHidden.setCustomValidity("");
+      }
+      
+      // Atualizar o resumo
+      atualizarResumo();
+    }
+    
+    // Atualizar resumo do pedido
+    function atualizarResumo() {
+      if (itens.length === 0) {
+        resumoItens.innerHTML = "<p>Nenhum item adicionado</p>";
+        resumoTotal.textContent = "R$ 0,00";
+        return;
+      }
+      
+      const valor = parseFloat(valorInput.value) || 0;
+      const valorPorItem = itens.length > 0 ? valor / itens.length : 0;
+      
+      let html = '';
+      itens.forEach((item, index) => {
+        html += `
+          <div class="resumo-item">
+            <span>${item}</span>
+            <span>R$ ${valorPorItem.toFixed(2)}</span>
+          </div>
+        `;
       });
-
-      const json = await res.json();
-      alert(json.message);
+      
+      resumoItens.innerHTML = html;
+      resumoTotal.textContent = `R$ ${valor.toFixed(2)}`;
+    }
+    
+    // Adicionar um item à lista
+    function adicionarItem(valor) {
+      const texto = valor.trim();
+      if (texto === "" || itens.includes(texto)) return;
+      
+      itens.push(texto);
+      
+      const itemTag = document.createElement("div");
+      itemTag.className = "item-tag";
+      itemTag.innerHTML = `${texto} <i class="fas fa-times" data-item="${texto}"></i>`;
+      
+      // Inserir antes do input
+      itensContainer.insertBefore(itemTag, itensInput);
+      itensInput.value = "";
+      
+      atualizarItensHidden();
+    }
+    
+    // Remover um item da lista
+    function removerItem(valor) {
+      itens = itens.filter(item => item !== valor);
+      
+      // Remover o elemento da DOM
+      const elementos = document.querySelectorAll(`.item-tag i[data-item="${valor}"]`);
+      elementos.forEach(el => el.parentNode.remove());
+      
+      atualizarItensHidden();
+    }
+    
+    // Eventos para itensInput
+    itensInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === ",") {
+        e.preventDefault();
+        adicionarItem(itensInput.value);
+      }
+    });
+    
+    // Permitir colar vários itens de uma vez
+    itensInput.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const texto = e.clipboardData.getData("text");
+      const itensColados = texto.split(/[,;\n]/).map(item => item.trim()).filter(item => item !== "");
+      
+      itensColados.forEach(item => adicionarItem(item));
+    });
+    
+    // Estilização do container de itens
+    itensBox.addEventListener("click", () => {
+      itensInput.focus();
+    });
+    
+    itensInput.addEventListener("focus", () => {
+      itensBox.classList.add("foco");
+    });
+    
+    itensInput.addEventListener("blur", () => {
+      itensBox.classList.remove("foco");
+      
+      // Adicionar o item atual se houver texto ao perder o foco
+      if (itensInput.value.trim() !== "") {
+        adicionarItem(itensInput.value);
+      }
+    });
+    
+    // Evento de delegação para remover itens
+    itensContainer.addEventListener("click", (e) => {
+      if (e.target.tagName === "I" && e.target.classList.contains("fa-times")) {
+        removerItem(e.target.dataset.item);
+      }
+    });
+    
+    // Atualizar resumo quando o valor mudar
+    valorInput.addEventListener("input", atualizarResumo);
+    
+    // Formatar o valor para duas casas decimais
+    valorInput.addEventListener("blur", () => {
+      if (valorInput.value) {
+        valorInput.value = parseFloat(valorInput.value).toFixed(2);
+        atualizarResumo();
+      }
+    });
+    
+    // Mostrar mensagem de resposta
+    function mostrarResposta(mensagem, tipo) {
+      respostaBox.className = `resposta ${tipo}`;
+      respostaBox.style.display = "block";
+      respostaBox.textContent = mensagem;
+      
+      // Ocultar após 5 segundos
+      setTimeout(() => {
+        respostaBox.style.opacity = '0';
+        setTimeout(() => {
+          respostaBox.style.display = 'none';
+          respostaBox.style.opacity = '1';
+        }, 500);
+      }, 5000);
+    }
+    
+    // Manipular envio do formulário (mantido próximo ao original para preservar a lógica de comunicação)
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      // Verificar se há pelo menos um item
+      if (itens.length === 0) {
+        mostrarResposta("Por favor, adicione pelo menos um item ao pedido", "erro");
+        return;
+      }
+      
+      const cliente = clienteInput.value.trim();
+      const valor = parseFloat(valorInput.value);
+      
+      // Desabilitar botão e mostrar loader
+      btnSubmit.disabled = true;
+      submitLoader.style.visibility = "visible";
+      
+      try {
+        // Mantendo a estrutura do objeto pedido conforme o código original
+        const pedido = {
+          cliente,
+          itens: itens.map((nome, i) => ({
+            id: i + 1,
+            nome: nome.trim(),
+            preco: parseFloat((valor / itens.length).toFixed(2)),
+            quantidade: 1
+          })),
+          valorTotal: valor.toFixed(2),
+          data: new Date().toISOString()
+        };
+        
+        const res = await fetch("http://localhost:8000/pedido", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pedido)
+        });
+        
+        const json = await res.json();
+        
+        if (res.ok) {
+          mostrarResposta(json.message || "Pedido enviado com sucesso!", "sucesso");
+          
+          // Limpar formulário
+          clienteInput.value = "";
+          itens = [];
+          itensContainer.querySelectorAll(".item-tag").forEach(tag => tag.remove());
+          valorInput.value = "";
+          atualizarItensHidden();
+          
+          // Adicionar notificação
+          adicionarNotificacao(`Pedido para ${cliente} enviado com sucesso!`, "check-circle");
+        } else {
+          mostrarResposta(json.message || "Erro ao enviar pedido", "erro");
+          adicionarNotificacao(`Erro ao processar pedido: ${json.message}`, "exclamation-circle");
+        }
+      } catch (error) {
+        console.error("Erro:", error);
+        mostrarResposta("Erro de conexão ao servidor", "erro");
+        adicionarNotificacao("Falha na comunicação com o servidor", "times-circle");
+      } finally {
+        // Reabilitar botão e esconder loader
+        btnSubmit.disabled = false;
+        submitLoader.style.visibility = "hidden";
+      }
     });
   </script>
 </body>
